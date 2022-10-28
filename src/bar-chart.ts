@@ -12,7 +12,7 @@ export function barChart() {
   const xScale = d3.scaleLinear().range(xRange);
   const yScale = d3.scaleBand().range(yRange).padding(0.1);
 
-  const xAxis = d3.axisTop(xScaleg).ticks(width / 80);
+  const xAxis = d3.axisTop(xScale).ticks(width / 80);
   const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
 
   // Create the SVG element for the chart.
