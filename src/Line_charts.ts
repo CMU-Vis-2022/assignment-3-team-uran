@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import {Table} from "apache-arrow";
 
 export function lineChart() {
   const margin = { top: 30, right: 0, bottom: 30, left: 50 };
@@ -15,43 +16,20 @@ export function lineChart() {
 
   //update the function
   function update(
-    X: Array<string>,
-    Y: Array<string>,
-    Y_ten: Array<string>,
-    Y_ninety: Array<string>,
-    scatter_usaqi: Array<string>,
-    scatter_date: Array<string>,
-    isScatter: boolean
+    airdata: Table,
+    scatter: Table,
+    isScatterPlot: boolean
   ) {
-
-
     // clear old diagram
-    svg.selectAll("#line_part1").remove();
-    svg.selectAll("#colorbox").remove();
-    svg.selectAll("#scatterplot").remove();
-    svg.selectAll("#linechart-mouseover").remove();
-    console.log("Line Chart Boolean: ", isScatter);
+    svg.selectAll("*").remove();
 
-    // map data to elements
-    const Yfloat = Y.map(Number);
-    const Yfloat10 = Y_ten.map(Number);
-    const Yfloat90 = Y_ninety.map(Number);
-
-    // mapping the date data and update
-    const date = [];
-    for (let i = 0; i < scatter_date.length; i++) {
-      date.push(new Date(scatter_date[i]));
-    }
-
-    const Xdate: Date[] = [];
-    for (let i = 0; i < X.length; i++) {
-      Xdate.push(new Date(X[i]));
-    }
-
-    const Xnum: number[] = [];
-    for (let i = 0; i < X.length; i++) {
-      Xnum.push(new Date(X[i]).getTime());
-    }
+    const Xdate = airdata
+      .getChild("month")!
+      .toJSON()
+      .map((t: number) => new Date(t).getTime());
+    const Yfloat = airdata.getChild("averageaqi")!.toArray();
+    const Yfloat10 = airdata.getChild("tenthAvg")!.toArray();
+    const Yfloat90 = airdata.getChild("nintyAvg")!.toArray();
     
     // making data into array
     const arrayXY = [];
@@ -64,18 +42,15 @@ export function lineChart() {
       });
     }
 
+    const xRange = [margin.left, width - margin.right];
+    const yRange = [margin.top, height - margin.bottom];
 
-    // constructing x-y axis and scale
-    const domain_min = new Date(Math.min.apply(null, Xnum));
-    const domain_max = new Date(Math.max.apply(null, Xnum));
-    const Xscale = d3.scaleTime()
-      .domain([domain_min, domain_max])
-      .range([margin.left, width - margin.right]);
-    const Yscale = d3.scaleTime()
-      .domain([domain_min, domain_max])
-      .range([height - margin.bottom, margin.top]);
-    const Xaxis = d3.axisBottom(Xscale);
-    const Yaxis = d3.axisLeft(Yscale);
+    // TODO: use the domain from the scatterplot data
+    const xScale = d3.scaleUtc().range(xRange).domain(d3.extent(Xdate) as any);
+    const yScale = d3.scaleLinear().range(yRange).domain([Math.max(...Yfloat), 0]);
+
+    const Xaxis = d3.axisBottom(xScale).ticks(width / 80);
+    const Yaxis = d3.axisLeft(yScale).tickSizeOuter(0);
 
     // data bindig to svg elemets
     svg.append("g")
@@ -89,12 +64,23 @@ export function lineChart() {
       .attr("id", "linechart1")
       .attr("transform", `translate(${margin.left},0)`);
 
+      const line = d3
+        .line<any>()
+        .curve(d3.curveLinear)
+        .x((d) => xScale(d.date))
+        .y((d) => yScale(d.usaqi));
 
-
-
+      svg
+      .append("path")
+      .attr("class", "line_part1")
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 1.5)
+      .attr("d", line(arrayXY));
   }
   return {
     element: svg.node()!,
+    update
   };
 }
 
