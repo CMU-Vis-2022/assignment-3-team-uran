@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import {Table} from "apache-arrow";
+import { area, curveBasis } from "d3";
 
 export function lineChart() {
   const margin = { top: 30, right: 0, bottom: 30, left: 50 };
@@ -30,6 +31,7 @@ export function lineChart() {
     const Yfloat = airdata.getChild("averageaqi")!.toArray();
     const Yfloat10 = airdata.getChild("tenthAvg")!.toArray();
     const Yfloat90 = airdata.getChild("nintyAvg")!.toArray();
+    const Yscatter = scatter.getChild("aqi")!.toArray();
     
     // making data into array
     const arrayXY = [];
@@ -39,20 +41,21 @@ export function lineChart() {
         usaqi: Yfloat[i],
         aqi10: Yfloat10[i],
         aqi90: Yfloat90[i],
+        aqi: Yscatter[i],
       });
     }
-
+console.log(arrayXY)
     const xRange = [margin.left, width - margin.right];
     const yRange = [margin.top, height - margin.bottom];
 
     // TODO: use the domain from the scatterplot data
     const xScale = d3.scaleUtc().range(xRange).domain(d3.extent(Xdate) as any);
-    const yScale = d3.scaleLinear().range(yRange).domain([Math.max(...Yfloat), 0]);
+    const yScale = d3.scaleLinear().range(yRange).domain([Math.max(...Yscatter), 0]);
 
     const Xaxis = d3.axisBottom(xScale).ticks(width / 80);
     const Yaxis = d3.axisLeft(yScale).tickSizeOuter(0);
 
-    // data bindig to svg elemets
+    // data bindig to line chart svg elemets??
     svg.append("g")
       .call(Xaxis)
       .attr("class", "Xaxis")
@@ -64,6 +67,7 @@ export function lineChart() {
       .attr("id", "linechart1")
       .attr("transform", `translate(${margin.left},0)`);
 
+      //render the line
       const line = d3
         .line<any>()
         .curve(d3.curveLinear)
@@ -77,6 +81,22 @@ export function lineChart() {
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
       .attr("d", line(arrayXY));
+
+      //render the lineArea
+      const lineArea = d3
+        .area<any>()
+        .curve(curveBasis)
+        .x((d) => xScale(d.date))
+        .y0((d) => yScale(d.aqi10))
+        .y1((d) => yScale(d.aqi90));
+
+      svg
+      .append("path")
+      .attr("class", "line_area")
+      .attr("fill", "back")
+      .attr("stroke", "none")
+      .attr("stroke-width", 0)
+      .attr("d", area(arrayXY));
   }
   return {
     element: svg.node()!,

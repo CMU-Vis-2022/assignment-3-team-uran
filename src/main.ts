@@ -33,7 +33,7 @@ ORDER by count DESC`);
 const select = d3.select(app).append("select");
 for (const location of station) {
   const s = select.append("option").text(`${location.location} (${location.count})`).attr('value', location.location);
-  if (location.location === "Avalon") {
+  if (location.location === "Lawrenceville") {
     s.attr('selected', true)
   }
 }
@@ -47,7 +47,7 @@ select.on("change", async () => {
 });
 
 // Update the chart with the first location.
-update("Avalon", false);
+update("Lawrenceville", false);
 
 const count = d3.select(app).append("div");
 
@@ -94,7 +94,7 @@ async function update(
   }
 
   const size = scatter.numRows;
-  count.text(`Number of records: ${size}`);
+  count.text(`Number of Records: ${size}`);
 
   chart.update(airdata, scatter, isScatterPlot);
 }
