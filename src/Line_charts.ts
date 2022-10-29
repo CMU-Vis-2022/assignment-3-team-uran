@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import {Table} from "apache-arrow";
 import { area, curveBasis } from "d3";
+console.log(d3)
 
 export function lineChart() {
   const margin = { top: 30, right: 0, bottom: 30, left: 50 };
@@ -28,23 +29,29 @@ export function lineChart() {
       .getChild("month")!
       .toJSON()
       .map((t: number) => new Date(t).getTime());
+    const Xdate_scatter = scatter
+      .getChild("day")!
+      .toJSON()
+      .map((t: number) => new Date(t).getTime());
     const Yfloat = airdata.getChild("averageaqi")!.toArray();
     const Yfloat10 = airdata.getChild("tenthAvg")!.toArray();
     const Yfloat90 = airdata.getChild("nintyAvg")!.toArray();
     const Yscatter = scatter.getChild("aqi")!.toArray();
+
     
     // making data into array
     const arrayXY = [];
     for (let i = 0; i < Yfloat.length; i++) {
       arrayXY.push({
         date: Xdate[i],
+        day: Xdate_scatter[i],
         usaqi: Yfloat[i],
         aqi10: Yfloat10[i],
         aqi90: Yfloat90[i],
         aqi: Yscatter[i],
       });
     }
-console.log(arrayXY)
+
     const xRange = [margin.left, width - margin.right];
     const yRange = [margin.top, height - margin.bottom];
 
@@ -93,10 +100,25 @@ console.log(arrayXY)
       svg
       .append("path")
       .attr("class", "line_area")
-      .attr("fill", "back")
+      .attr("fill", "black")
+      .attr("opacity", .2)
       .attr("stroke", "none")
       .attr("stroke-width", 0)
-      .attr("d", area(arrayXY));
+      .attr("d", lineArea(arrayXY));
+
+
+      //render the points
+      const scatterChart = svg.append("g").attr("fill", "steelblue");
+      const I = arrayXY
+
+      scatterChart
+      .selectAll("circle")
+      .data(I)
+      .join("circle")
+      .attr("cx", (d) => xScale(d.day))
+      .attr("cy", (d) => yScale(d.aqi))
+      .attr("r", 2);
+      
   }
   return {
     element: svg.node()!,
