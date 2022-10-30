@@ -5,6 +5,7 @@ import {lineChart} from "./line_charts";
 import { Int32, Table, Utf8, Date_ } from "apache-arrow";
 import { db } from "./duckdb";
 import parquet from "./pittsburgh-air-quality.parquet?url";
+import { chordTranspose } from "d3";
 
 const app = document.querySelector("#app")!;
 
@@ -32,7 +33,7 @@ ORDER by count DESC`);
 // Create a select element for the locations.
 const select = d3.select(app).append("select");
 for (const location of station) {
-  const s = select.append("option").text(`${location.location} (${location.count})`).attr('value', location.location);
+  const s = select.append("option").text(`${location.location}`).attr('value', location.location);
   if (location.location === "Lawrenceville") {
     s.attr('selected', true)
   }
@@ -46,10 +47,13 @@ select.on("change", async () => {
   update(location, false);
 });
 
+
+
 // Update the chart with the first location.
 update("Lawrenceville", false);
 
 const count = d3.select(app).append("div");
+
 
 // Add the chart to the DOM.
 app.appendChild(chart.element);
@@ -73,7 +77,9 @@ async function update(
     ORDER BY month `);
 
     scatter = await conn.query(`
-    SELECT date as day, "US AQI"::FLOAT as aqi
+    SELECT  
+      "Timestamp(UTC)" as day, 
+      "US AQI"::FLOAT as aqi
     FROM "pittsburgh-air-quality.parquet"`);
   } else {
     airdata = await conn.query(`
@@ -88,7 +94,9 @@ async function update(
     ORDER BY month `);
 
     scatter = await conn.query(`
-    SELECT "Timestamp(UTC)" as day, "US AQI"::FLOAT as aqi
+    SELECT 
+      "Timestamp(UTC)" as day, 
+      "US AQI"::FLOAT as aqi
     FROM "pittsburgh-air-quality.parquet"
     WHERE "Station name" = '${station}' `);
   }
@@ -97,6 +105,18 @@ async function update(
   count.text(`Number of Records: ${size}`);
 
   chart.update(airdata, scatter, isScatterPlot);
+
+  const checkBox = d3.select(app).append("div");
+  const checkBox_1 = d3
+  .select(app)
+  .append('input')
+  .attr('type','checkbox')
+
+  checkBox_1.text("Show raw data")
+  checkBox.text(`Show true or false: ${isScatterPlot}`)
+
+
+  checkBox_1.on("click", check);
 }
 
 app.appendChild(chart.element);
