@@ -3,6 +3,9 @@
 
 A link to the deployed project: http://127.0.0.1:5174/assignment-3-team-uran/
 
+We both don't have the background of coding thus we achieved the data processing, line chart and the greyed out area for each within 10% to 90% of the data. We developed the page together, with enormous help from Prof. Dominik Moritz for learning and trying to use D3 for visulization and publication. The link above directs to the web page of the AQI data visualization result we got.
+
+-------------------
 
 A template for an interactive web application with D3
 
