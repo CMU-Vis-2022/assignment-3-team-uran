@@ -1,6 +1,9 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=8771141&assignment_repo_type=AssignmentRepo)
 # D3-App-Template
 
+A link to the deployed project: http://127.0.0.1:5174/assignment-3-team-uran/
+
+
 A template for an interactive web application with D3
 
 ## Launch the app
