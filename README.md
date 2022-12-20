@@ -1,7 +1,7 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=8771141&assignment_repo_type=AssignmentRepo)
 # D3-App-Template
 
-A link to the deployed project: http://127.0.0.1:5174/assignment-3-team-uran/
+A link to the deployed project
 
 We both don't have the background of coding thus we achieved the data processing, line chart and the greyed out area for each within 10% to 90% of the data. We developed the page together, with enormous help from Prof. Dominik Moritz for learning and trying to use D3 for visulization and publication. The link above directs to the web page of the AQI data visualization result we got.
 
